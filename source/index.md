@@ -4,11 +4,10 @@ title: API Reference
 language_tabs:
   - shell
   - ruby
-  - python
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a>
+  - <a href='/settings'>Sign Up for a Developer Key</a>
+  - <a href='http://www.licensearch.com'>Back to portal.</a>
 
 includes:
   - errors
@@ -18,151 +17,237 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to licensearch.com. An api for business license information in the following states.
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+<a href='http://www.licensearch.com'>Back to portal.</a>
+|
+<a href='http://www.github.com/danbickford007/licensearch-gem'>RUBY GEM</a>
 
-This example API documentation page was created with [Slate](http://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
+* Florida
+* Georgia 
+
+More states will be added in the future.
 
 # Authentication
 
 > To authorize, use this code:
 
+A note: queries to the API via the ruby gem does not require authentication for each request.
+
 ```ruby
-require 'kittn'
+require 'licensearch'
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
+Florida.auth
 ```
 
 ```shell
 # With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+curl -i 'http://www.licensearch.com/api/auth?token=mytoken'
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+> {secret: abc123}
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+```shell
+# Then use this token for every request after for a 60 minute period.
+curl -i 'http://www.licensearch.com/api/florida/business/count?token=mytoken&secret=abc123'
+```
+```ruby
+require 'licensearch'
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+Florida::Business.count
+```
 
-`Authorization: meowmeowmeow`
+
+> {count: 1234567}
+
+Licensearch.com uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://www.licensearch.com/settings).
+
+Licensearch.com expects for the API key and secret to be included in all API requests to the server in a header that looks like the following:
+
+`?token=mytoken&secret=abc123`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+You must replace <code>token</code> with your personal API key and <code>secret</code>with the temporary secret.
 </aside>
 
-# Kittens
+# Business
 
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+## Get Business Count
 
 ```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+# Then use this token for every request after for a 60 minute period.
+curl -i '/api/florida/business/count'
 ```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Isis",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
 ```ruby
-require 'kittn'
+require 'licensearch'
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
+Florida::Business.count
 ```
 
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Isis",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+  "count": 1234
 }
 ```
 
-This endpoint retrieves a specific kitten.
+
+This endpoint count of businesses.
+
+### HTTP Request
+
+`GET http://www.licensearch.com/api/florida/business/count`
+
+### Query Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+active_only | false | If set to true, the result will filtered by businesses with active licenses.
+inactive_only | false | If set to true, the result will filtered by businesses with inactive licenses.
+
+<aside class="success">
+Remember — setting both active_only and inactive_only will not return results!
+</aside>
+
+## Get all active businesses
+
+```shell
+# Retrieve array of active businesses in florida.
+curl -i '/api/florida/business/active?page1'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+ [
+   {
+     "id":29,
+     "name":"A CORP.",
+     "document_number":"484073",
+     "ein":"59-1581183",
+     "date_filed":"09/08/1975",
+     "status":"ACTIVE",
+     "last_event":"NAME CHANGE AMENDMENT",
+     "principal_address":"\r\n\r\n\r\n14508 S. TAMIAMI TRAIL\r\n            FT MYERS, FL 33912\r\n\r\n    \r\n\r\n    \r\n\r\n",
+     "mailing_address":null,"agent":"HUCKE, WILLIAM J\r\n",
+     "state":"FL",
+     "url":null
+    }
+ ] 
+```
+
+This endpoint retrieves a specific business.
 
 <aside class="warning">If you're not using an administrator API key, note that some kittens will return 403 Forbidden if they are hidden for admins only.</aside>
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`GET /api/florida/business/active?page=1`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+page        integer : pagination
 
+
+
+## Query for business - Florida
+
+```shell
+# Retrieve array of businesses matching criteria.
+curl -i '/api/florida/business/query?name=abc'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+ [
+   {
+     "id":29,
+     "name":"A CORP.",
+     "document_number":"484073",
+     "ein":"59-1581183",
+     "date_filed":"09/08/1975",
+     "status":"ACTIVE",
+     "last_event":"NAME CHANGE AMENDMENT",
+     "principal_address":"\r\n\r\n\r\n14508 S. TAMIAMI TRAIL\r\n            FT MYERS, FL 33912\r\n\r\n    \r\n\r\n    \r\n\r\n",
+     "mailing_address":null,"agent":"HUCKE, WILLIAM J\r\n",
+     "state":"FL",
+     "url":null
+    }
+ ] 
+```
+
+This endpoint retrieves a specific business.
+
+### HTTP Request
+
+`GET /api/florida/business/query?name=abc`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+name      |  Business Name
+document_number | Document Number
+ein       | EIN
+date_filed | The date business was filed
+status    | ACTIVE or INACTIVE pertaining to business license
+last_event | Last recorded activity of business
+principal_address | Official Address
+mailing_address | The mailing address
+state     | Which state business is in
+url       | URL of business 
+
+
+
+## Query for business - Georgia
+
+```shell
+# Retrieve array of businesses matching criteria.
+curl -i '/api/georgia/business/query?name=abc'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+ [
+   {
+     "id":29,
+     "name":"A CORP.",
+     "document_number":"484073",
+     "ein":"59-1581183",
+     "date_filed":"09/08/1975",
+     "status":"ACTIVE",
+     "last_event":"NAME CHANGE AMENDMENT",
+     "principal_address":"\r\n\r\n\r\n14508 S. TAMIAMI TRAIL\r\n            FT MYERS, FL 33912\r\n\r\n    \r\n\r\n    \r\n\r\n",
+     "mailing_address":null,"agent":"HUCKE, WILLIAM J\r\n",
+     "state":"FL",
+     "url":null
+    }
+ ] 
+```
+
+This endpoint retrieves a specific business.
+
+### HTTP Request
+
+`GET /api/georgia/business/query?name=abc`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+name      |  Business Name
+business_type | Document Number
+naics_code | NAICS Code 
+principal_address | Main Address
+state | State formed in
+control_number | Control Number
+status | Status
+date_formed | Date Business Formed
+agent | Registered Agent
+address | Registered Address
